@@ -1,0 +1,38 @@
+name: Publish Extension
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to Raycast Store
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npx eslint src/ --ext .ts,.tsx
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        run: npx @raycast/api@latest publish
+        env:
+          RAYCAST_API_TOKEN: ${{ secrets.RAYCAST_API_TOKEN }}
