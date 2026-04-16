@@ -46,6 +46,9 @@ export interface MorgenEvent {
   accountId: string;
   calendarName?: string;
   showWithoutTime?: boolean;
+  description?: string;
+  location?: string;
+  conferenceUrl?: string;
 }
 
 interface CalendarsResponse {
