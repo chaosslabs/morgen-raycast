@@ -1,6 +1,6 @@
 import { List, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { EventWithCalendar, formatTime, computeDuration, fetchEventsWithErrorHandling } from "./utils";
+import { EventWithCalendar, formatTime, computeDuration, getConferenceUrl, fetchEventsWithErrorHandling } from "./utils";
 import { EventActions } from "./event-actions";
 
 export default function ListTodayEvents() {
@@ -29,7 +29,7 @@ export default function ListTodayEvents() {
           const time = event.showWithoutTime ? "All day" : formatTime(event.start);
           const duration = computeDuration(event.start, event.end);
           const accessories = [
-            ...(event.conferenceUrl ? [{ icon: Icon.Video }] : []),
+            ...(getConferenceUrl(event) ? [{ icon: Icon.Video }] : []),
             { text: event.calendarName },
             ...(duration ? [{ text: duration }] : []),
           ];

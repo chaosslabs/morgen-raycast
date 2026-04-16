@@ -36,19 +36,40 @@ export interface MorgenCalendar {
   readOnly?: boolean;
 }
 
+export interface MorgenLocation {
+  "@type"?: "Location";
+  name?: string;
+}
+
+export interface MorgenParticipant {
+  "@type"?: "Participant";
+  name?: string;
+  email?: string;
+  roles?: { attendee?: boolean; owner?: boolean };
+  participationStatus?: string;
+}
+
 export interface MorgenEvent {
   id?: string;
   title: string;
   start: string;
   end?: string;
   duration?: string;
+  timeZone?: string;
   calendarId: string;
   accountId: string;
   calendarName?: string;
   showWithoutTime?: boolean;
   description?: string;
-  location?: string;
-  conferenceUrl?: string;
+  descriptionContentType?: string;
+  locations?: Record<string, MorgenLocation>;
+  participants?: Record<string, MorgenParticipant>;
+  freeBusyStatus?: string;
+  privacy?: string;
+  "google.com:hangoutLink"?: string;
+  "morgen.so:derived"?: {
+    virtualRoom?: { url?: string };
+  };
 }
 
 interface CalendarsResponse {

@@ -25,6 +25,16 @@ export function computeDuration(start: string, end?: string): string {
   return remaining > 0 ? `${hours}h ${remaining}m` : `${hours}h`;
 }
 
+export function getConferenceUrl(event: MorgenEvent): string | undefined {
+  return event["morgen.so:derived"]?.virtualRoom?.url ?? event["google.com:hangoutLink"];
+}
+
+export function getLocation(event: MorgenEvent): string | undefined {
+  if (!event.locations) return undefined;
+  const first = Object.values(event.locations)[0];
+  return first?.name || undefined;
+}
+
 export async function fetchEventsForRange(start: string, end: string): Promise<EventWithCalendar[]> {
   const calendars = await listCalendars();
   if (calendars.length === 0) return [];
