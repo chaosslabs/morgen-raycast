@@ -4,6 +4,7 @@ const BASE_URL = "https://api.morgen.so/v3";
 
 interface Preferences {
   morgenApiKey: string;
+  calendarName?: string;
 }
 
 export async function morgenFetch<T>(
@@ -101,7 +102,15 @@ interface EventsResponse {
 
 export async function listCalendars(): Promise<MorgenCalendar[]> {
   const result = await morgenFetch<CalendarsResponse>("/calendars/list");
-  return result.data?.calendars ?? [];
+  const calendars = result.data?.calendars ?? [];
+  const scope = getPreferenceValues<Preferences>().calendarName?.trim();
+  if (!scope) return calendars;
+  const selected = calendars.filter((calendar) => calendar.name === scope);
+  if (selected.length === 0)
+    throw new Error(
+      "No calendar matches Calendar Scope. Check the exact calendar name in preferences.",
+    );
+  return selected;
 }
 
 export async function listEvents(

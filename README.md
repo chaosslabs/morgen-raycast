@@ -27,6 +27,10 @@ Create a new calendar event with a title, date, start time, duration, and calend
 3. Enter the key in the extension preferences in Raycast; do not put it in source files or chat.
 4. Open Raycast AI Chat and mention `@Morgen`, or search for **Ask Morgen**. Raycast AI access is required.
 
+## Calendar scope
+
+Set **Calendar Scope** in Raycast extension preferences to an exact calendar name to restrict commands and AI tools to matching calendars. Leave it empty to use all connected calendars. If the name does not match, the extension returns an error instead of querying other calendars. Calendar names may not be unique across accounts; use a unique name when strict isolation is needed.
+
 ## AI tools
 
 - **List Calendars** returns calendar IDs, write permissions, current time, and your local timezone.

@@ -74,3 +74,15 @@ test('API unwraps created event and rejects success responses missing its ID', a
   response = { data: {} };
   await assert.rejects(api.createEvent({}), /Check Morgen before retrying/);
 });
+
+test('calendar scope excludes other calendars and fails closed for unknown names', async () => {
+  let scope = 'Personal';
+  const api = load('src/api.ts', { '@raycast/api': { getPreferenceValues: () => ({ morgenApiKey: 'test', calendarName: scope }), showToast: async () => {}, Toast: { Style: { Failure: 'failure' } } } }, {
+    fetch: async () => ({ ok: true, json: async () => ({ data: { calendars: [{ id: 'personal', name: 'Personal' }, { id: 'work', name: 'Work' }] } }) }),
+  });
+  const selected = await api.listCalendars();
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].id, 'personal');
+  scope = 'Missing';
+  await assert.rejects(api.listCalendars(), /No calendar matches/);
+});
