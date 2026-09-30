@@ -1,6 +1,12 @@
 import { List, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { EventWithCalendar, formatDateTime, computeDuration, getConferenceUrl, fetchEventsWithErrorHandling } from "./utils";
+import {
+  EventWithCalendar,
+  formatDateTime,
+  computeDuration,
+  getConferenceUrl,
+  fetchEventsWithErrorHandling,
+} from "./utils";
 import { EventActions } from "./event-actions";
 
 export default function SearchEvents() {
@@ -13,7 +19,10 @@ export default function SearchEvents() {
       const now = new Date();
       const end30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      const { events } = await fetchEventsWithErrorHandling(now.toISOString(), end30.toISOString());
+      const { events } = await fetchEventsWithErrorHandling(
+        now.toISOString(),
+        end30.toISOString(),
+      );
       setAllEvents(events);
       setIsLoading(false);
     }
@@ -21,7 +30,9 @@ export default function SearchEvents() {
   }, []);
 
   const filtered = searchText
-    ? allEvents.filter((e) => e.title?.toLowerCase().includes(searchText.toLowerCase()))
+    ? allEvents.filter((e) =>
+        e.title?.toLowerCase().includes(searchText.toLowerCase()),
+      )
     : allEvents;
 
   return (
@@ -35,12 +46,22 @@ export default function SearchEvents() {
         <List.EmptyView
           icon={Icon.MagnifyingGlass}
           title="No Events Found"
-          description={searchText ? "Try a different search term" : "No upcoming events in the next 30 days"}
+          description={
+            searchText
+              ? "Try a different search term"
+              : "No upcoming events in the next 30 days"
+          }
         />
       ) : (
         filtered.map((event, index) => {
-          const datetime = event.showWithoutTime ? "All day" : formatDateTime(event.start);
-          const duration = computeDuration(event.start, event.end);
+          const datetime = event.showWithoutTime
+            ? "All day"
+            : formatDateTime(event.start);
+          const duration = computeDuration(
+            event.start,
+            event.end,
+            event.duration,
+          );
           const accessories = [
             ...(getConferenceUrl(event) ? [{ icon: Icon.Video }] : []),
             { text: event.calendarName },

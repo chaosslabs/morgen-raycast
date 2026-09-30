@@ -7,9 +7,17 @@ export function EventActions({ event }: { event: EventWithCalendar }) {
 
   return (
     <ActionPanel>
-      <Action.Open title="Open in Morgen" icon={Icon.Calendar} target="morgen://" />
+      <Action.Open
+        title="Open in Morgen"
+        icon={Icon.Calendar}
+        target="morgen://"
+      />
       {conferenceUrl && (
-        <Action.OpenInBrowser title="Join Meeting" icon={Icon.Video} url={conferenceUrl} />
+        <Action.OpenInBrowser
+          title="Join Meeting"
+          icon={Icon.Video}
+          url={conferenceUrl}
+        />
       )}
       {location && (
         <Action.OpenInBrowser
@@ -18,7 +26,10 @@ export function EventActions({ event }: { event: EventWithCalendar }) {
           icon={Icon.Pin}
         />
       )}
-      <Action.OpenInBrowser title="Open in Browser" url="https://platform.morgen.so" />
+      <Action.OpenInBrowser
+        title="Open in Browser"
+        url="https://platform.morgen.so"
+      />
       <Action.CopyToClipboard title="Copy Event Title" content={event.title} />
       {location && (
         <Action.CopyToClipboard

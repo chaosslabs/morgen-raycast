@@ -10,15 +10,36 @@ export function formatTime(isoString: string): string {
 
 export function formatDateTime(isoString: string): string {
   const date = new Date(isoString);
-  const dateStr = date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
-  const timeStr = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const dateStr = date.toLocaleDateString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const timeStr = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   return `${dateStr} ${timeStr}`;
 }
 
-export function computeDuration(start: string, end?: string): string {
-  if (!end) return "";
-  const ms = new Date(end).getTime() - new Date(start).getTime();
-  const minutes = Math.round(ms / 60000);
+export function computeDuration(
+  start: string,
+  end?: string,
+  duration?: string,
+): string {
+  let minutes: number | undefined;
+  if (duration) {
+    const match = duration.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);
+    if (match) {
+      const h = parseInt(match[1] ?? "0", 10);
+      const m = parseInt(match[2] ?? "0", 10);
+      minutes = h * 60 + m;
+    }
+  } else if (end) {
+    const ms = new Date(end).getTime() - new Date(start).getTime();
+    minutes = Math.round(ms / 60000);
+  }
+  if (minutes === undefined || minutes <= 0) return "";
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
   const remaining = minutes % 60;
@@ -26,7 +47,10 @@ export function computeDuration(start: string, end?: string): string {
 }
 
 export function getConferenceUrl(event: MorgenEvent): string | undefined {
-  return event["morgen.so:derived"]?.virtualRoom?.url ?? event["google.com:hangoutLink"];
+  return (
+    event["morgen.so:derived"]?.virtualRoom?.url ??
+    event["google.com:hangoutLink"]
+  );
 }
 
 export function getLocation(event: MorgenEvent): string | undefined {
@@ -35,13 +59,16 @@ export function getLocation(event: MorgenEvent): string | undefined {
   return first?.name || undefined;
 }
 
-export async function fetchEventsForRange(start: string, end: string): Promise<EventWithCalendar[]> {
+export async function fetchEventsForRange(
+  start: string,
+  end: string,
+): Promise<EventWithCalendar[]> {
   const calendars = await listCalendars();
   if (calendars.length === 0) return [];
 
   const calendarMap = new Map<string, MorgenCalendar>();
   for (const cal of calendars) {
-    calendarMap.set(cal.calendarId, cal);
+    calendarMap.set(cal.id, cal);
   }
 
   const grouped = new Map<string, MorgenCalendar[]>();
@@ -53,7 +80,7 @@ export async function fetchEventsForRange(start: string, end: string): Promise<E
 
   const allEvents: EventWithCalendar[] = [];
   for (const [accountId, cals] of grouped) {
-    const calendarIds = cals.map((c) => c.calendarId);
+    const calendarIds = cals.map((c) => c.id);
     const evts = await listEvents(accountId, calendarIds, start, end);
     for (const evt of evts) {
       const cal = calendarMap.get(evt.calendarId);
@@ -61,7 +88,9 @@ export async function fetchEventsForRange(start: string, end: string): Promise<E
     }
   }
 
-  allEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  allEvents.sort(
+    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+  );
   return allEvents;
 }
 

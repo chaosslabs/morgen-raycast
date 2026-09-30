@@ -1,6 +1,12 @@
 import { List, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { EventWithCalendar, formatTime, computeDuration, getConferenceUrl, fetchEventsWithErrorHandling } from "./utils";
+import {
+  EventWithCalendar,
+  formatTime,
+  computeDuration,
+  getConferenceUrl,
+  fetchEventsWithErrorHandling,
+} from "./utils";
 import { EventActions } from "./event-actions";
 
 export default function ListTodayEvents() {
@@ -10,10 +16,17 @@ export default function ListTodayEvents() {
   useEffect(() => {
     async function fetchEvents() {
       const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startOfDay = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      );
       const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
-      const { events } = await fetchEventsWithErrorHandling(startOfDay.toISOString(), endOfDay.toISOString());
+      const { events } = await fetchEventsWithErrorHandling(
+        startOfDay.toISOString(),
+        endOfDay.toISOString(),
+      );
       setEvents(events);
       setIsLoading(false);
     }
@@ -23,11 +36,21 @@ export default function ListTodayEvents() {
   return (
     <List isLoading={isLoading} searchBarPlaceholder="Filter today's events...">
       {events.length === 0 && !isLoading ? (
-        <List.EmptyView icon={Icon.Calendar} title="No Events Today" description="Enjoy your free day!" />
+        <List.EmptyView
+          icon={Icon.Calendar}
+          title="No Events Today"
+          description="Enjoy your free day!"
+        />
       ) : (
         events.map((event, index) => {
-          const time = event.showWithoutTime ? "All day" : formatTime(event.start);
-          const duration = computeDuration(event.start, event.end);
+          const time = event.showWithoutTime
+            ? "All day"
+            : formatTime(event.start);
+          const duration = computeDuration(
+            event.start,
+            event.end,
+            event.duration,
+          );
           const accessories = [
             ...(getConferenceUrl(event) ? [{ icon: Icon.Video }] : []),
             { text: event.calendarName },

@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 type ExtensionPreferences = {
-  /** Morgen API Key - Your Morgen API key from morgen.so */
+  /** Morgen API Key - API key from the Developers API page at platform.morgen.so. Requires a Morgen plan with API access. */
   "morgenApiKey": string
 }
 

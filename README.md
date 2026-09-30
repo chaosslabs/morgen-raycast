@@ -1,6 +1,10 @@
 # Morgen for Raycast
 
-Interact with your [Morgen](https://morgen.so) calendars directly from Raycast. View today's schedule, search upcoming events, and create new events without leaving your workflow.
+Your Morgen calendar, a few keystrokes away. See today's schedule, find upcoming meetings, and create events through commands or Raycast AI.
+
+An independent, open-source integration maintained by [chaOSSlabs](https://github.com/chaosslabs). Not affiliated with or endorsed by Morgen.
+
+[Source code](https://github.com/chaosslabs/morgen-raycast) · [Report an issue](https://github.com/chaosslabs/morgen-raycast/issues) · [MIT license](LICENSE)
 
 ## Commands
 
@@ -18,9 +22,22 @@ Create a new calendar event with a title, date, start time, duration, and calend
 
 ## Setup
 
-1. Install this extension from the Raycast Store.
-2. Get your Morgen API key from [morgen.so](https://morgen.so) (Settings > Integrations > API Keys).
-3. When prompted, enter your API key in the extension preferences.
+1. Install dependencies with `npm ci`, then run `npm run dev` to import this local extension into Raycast. Use Node.js 22.14 or newer.
+2. Get your Morgen API key from the Developers API page at [Morgen platform](https://platform.morgen.so). Your Morgen plan must include API access.
+3. Enter the key in the extension preferences in Raycast; do not put it in source files or chat.
+4. Open Raycast AI Chat and mention `@Morgen`, or search for **Ask Morgen**. Raycast AI access is required.
+
+## AI tools
+
+- **List Calendars** returns calendar IDs, write permissions, current time, and your local timezone.
+- **Find Events** reads events across connected calendars for a range of up to 62 days, optionally filtering by title.
+- **Create Event** creates one timed event after a confirmation preview showing title, calendar, start/timezone, and duration. Raycast tool permission settings govern when confirmation is shown.
+
+Try “What meetings do I have tomorrow?” or “Create a 45-minute Focus event tomorrow at 10 on my Work calendar.” If calendars are ambiguous, the AI should ask which one to use. Event creation does not invite attendees; editing, deleting, recurring events, and all-day creation are not supported by these tools.
+
+Creation errors must not be automatically retried: check Morgen first in case the request succeeded before the connection failed.
+
+See [Raycast AI Extensions](https://developers.raycast.com/ai/create-an-ai-extension) and [Morgen authentication](https://docs.morgen.so/authentication).
 
 ## Development
 
@@ -37,3 +54,13 @@ npm run lint
 # Type-check
 npx tsc --noEmit
 ```
+
+Run `npm test` for isolated tool/API tests and `npm run build` to validate generated AI tool schemas. These checks do not verify a live Morgen account. The public Store publisher is `biancarosa`. Source code and project maintenance remain under chaOSSlabs on GitHub. Store publication remains subject to Raycast review.
+
+## Data and privacy
+
+The extension reads your API key from Raycast preferences and sends authenticated requests to Morgen. It does not include a separate analytics service. When using AI tools, calendar names and event details returned by those tools are available to Raycast AI; review your Raycast AI settings before use.
+
+## Contributing
+
+Bug reports and pull requests are welcome in the chaOSSlabs repository. Include reproduction steps and redact API keys and private calendar details. Run `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` before submitting a change.

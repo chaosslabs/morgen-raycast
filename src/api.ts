@@ -6,7 +6,10 @@ interface Preferences {
   morgenApiKey: string;
 }
 
-export async function morgenFetch<T>(path: string, options?: RequestInit): Promise<T> {
+export async function morgenFetch<T>(
+  path: string,
+  options?: RequestInit,
+): Promise<T> {
   const { morgenApiKey } = getPreferenceValues<Preferences>();
 
   const response = await fetch(`${BASE_URL}${path}`, {
@@ -21,7 +24,11 @@ export async function morgenFetch<T>(path: string, options?: RequestInit): Promi
   if (!response.ok) {
     const body = await response.text();
     const message = `Morgen API error (${response.status}): ${body}`;
-    await showToast({ style: Toast.Style.Failure, title: "API Error", message });
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "API Error",
+      message,
+    });
     throw new Error(message);
   }
 
@@ -29,11 +36,18 @@ export async function morgenFetch<T>(path: string, options?: RequestInit): Promi
 }
 
 export interface MorgenCalendar {
+  id: string;
   accountId: string;
-  calendarId: string;
   name: string;
   color?: string;
-  readOnly?: boolean;
+  myRights?: {
+    mayReadFreeBusy?: boolean;
+    mayReadItems?: boolean;
+    mayWriteAll?: boolean;
+    mayWriteOwn?: boolean;
+    mayAdmin?: boolean;
+    mayDelete?: boolean;
+  };
 }
 
 export interface MorgenLocation {
@@ -73,16 +87,21 @@ export interface MorgenEvent {
 }
 
 interface CalendarsResponse {
-  data: MorgenCalendar[];
+  data: {
+    accounts: unknown[];
+    calendars: MorgenCalendar[];
+  };
 }
 
 interface EventsResponse {
-  data: MorgenEvent[];
+  data: {
+    events: MorgenEvent[];
+  };
 }
 
 export async function listCalendars(): Promise<MorgenCalendar[]> {
   const result = await morgenFetch<CalendarsResponse>("/calendars/list");
-  return result.data ?? [];
+  return result.data?.calendars ?? [];
 }
 
 export async function listEvents(
@@ -97,8 +116,10 @@ export async function listEvents(
     start,
     end,
   });
-  const result = await morgenFetch<EventsResponse>(`/events/list?${params.toString()}`);
-  return result.data ?? [];
+  const result = await morgenFetch<EventsResponse>(
+    `/events/list?${params.toString()}`,
+  );
+  return result.data?.events ?? [];
 }
 
 export interface CreateEventPayload {
@@ -111,10 +132,20 @@ export interface CreateEventPayload {
   showWithoutTime: false;
 }
 
-export async function createEvent(payload: CreateEventPayload): Promise<MorgenEvent> {
-  const result = await morgenFetch<{ data: MorgenEvent }>("/events/create", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-  return result.data;
+export async function createEvent(
+  payload: CreateEventPayload,
+): Promise<MorgenEvent> {
+  const result = await morgenFetch<{ data: { event: MorgenEvent } }>(
+    "/events/create",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!result.data?.event?.id) {
+    throw new Error(
+      "Creation response did not include an event ID. Check Morgen before retrying.",
+    );
+  }
+  return result.data.event;
 }

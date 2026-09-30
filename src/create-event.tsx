@@ -1,4 +1,12 @@
-import { ActionPanel, Action, Form, showHUD, showToast, Toast, Icon } from "@raycast/api";
+import {
+  ActionPanel,
+  Action,
+  Form,
+  showHUD,
+  showToast,
+  Toast,
+  Icon,
+} from "@raycast/api";
 import { useEffect, useState } from "react";
 import { createEvent, listCalendars, MorgenCalendar } from "./api";
 
@@ -29,7 +37,11 @@ export default function CreateEvent() {
     async function fetchCalendars() {
       try {
         const cals = await listCalendars();
-        setCalendars(cals.filter((c) => !c.readOnly));
+        setCalendars(
+          cals.filter(
+            (c) => c.myRights?.mayWriteAll || c.myRights?.mayWriteOwn,
+          ),
+        );
       } catch (error) {
         await showToast({
           style: Toast.Style.Failure,
@@ -45,17 +57,28 @@ export default function CreateEvent() {
 
   async function handleSubmit(values: FormValues) {
     if (!values.title.trim()) {
-      await showToast({ style: Toast.Style.Failure, title: "Title is required" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Title is required",
+      });
       return;
     }
     if (!values.calendar) {
-      await showToast({ style: Toast.Style.Failure, title: "Please select a calendar" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Please select a calendar",
+      });
       return;
     }
 
-    const calendar = calendars.find((c) => `${c.accountId}::${c.calendarId}` === values.calendar);
+    const calendar = calendars.find(
+      (c) => `${c.accountId}::${c.id}` === values.calendar,
+    );
     if (!calendar) {
-      await showToast({ style: Toast.Style.Failure, title: "Invalid calendar selection" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Invalid calendar selection",
+      });
       return;
     }
 
@@ -73,10 +96,13 @@ export default function CreateEvent() {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     try {
-      await showToast({ style: Toast.Style.Animated, title: "Creating event..." });
+      await showToast({
+        style: Toast.Style.Animated,
+        title: "Creating event...",
+      });
       await createEvent({
         accountId: calendar.accountId,
-        calendarId: calendar.calendarId,
+        calendarId: calendar.id,
         title: values.title.trim(),
         start: startISO,
         duration: values.duration,
@@ -101,24 +127,41 @@ export default function CreateEvent() {
       isLoading={isLoading}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Create Event" icon={Icon.Plus} onSubmit={handleSubmit} />
+          <Action.SubmitForm
+            title="Create Event"
+            icon={Icon.Plus}
+            onSubmit={handleSubmit}
+          />
         </ActionPanel>
       }
     >
-      <Form.TextField id="title" title="Title" placeholder="Meeting with team" />
+      <Form.TextField
+        id="title"
+        title="Title"
+        placeholder="Meeting with team"
+      />
       <Form.DatePicker id="date" title="Date" defaultValue={now} />
-      <Form.TextField id="startTime" title="Start Time" placeholder="14:00" defaultValue={defaultTime} />
+      <Form.TextField
+        id="startTime"
+        title="Start Time"
+        placeholder="14:00"
+        defaultValue={defaultTime}
+      />
       <Form.Dropdown id="duration" title="Duration" defaultValue="PT1H">
         {DURATION_OPTIONS.map((opt) => (
-          <Form.Dropdown.Item key={opt.value} title={opt.title} value={opt.value} />
+          <Form.Dropdown.Item
+            key={opt.value}
+            title={opt.title}
+            value={opt.value}
+          />
         ))}
       </Form.Dropdown>
       <Form.Dropdown id="calendar" title="Calendar">
         {calendars.map((cal) => (
           <Form.Dropdown.Item
-            key={`${cal.accountId}::${cal.calendarId}`}
+            key={`${cal.accountId}::${cal.id}`}
             title={cal.name}
-            value={`${cal.accountId}::${cal.calendarId}`}
+            value={`${cal.accountId}::${cal.id}`}
           />
         ))}
       </Form.Dropdown>
