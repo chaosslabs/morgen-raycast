@@ -32,6 +32,7 @@ interface FormValues {
 export default function CreateEvent() {
   const [calendars, setCalendars] = useState<MorgenCalendar[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     async function fetchCalendars() {
@@ -43,6 +44,7 @@ export default function CreateEvent() {
           ),
         );
       } catch (error) {
+        setHasError(true);
         await showToast({
           style: Toast.Style.Failure,
           title: "Failed to load calendars",
@@ -56,6 +58,7 @@ export default function CreateEvent() {
   }, []);
 
   async function handleSubmit(values: FormValues) {
+    if (isLoading || hasError) return;
     if (!values.title.trim()) {
       await showToast({
         style: Toast.Style.Failure,
@@ -135,6 +138,12 @@ export default function CreateEvent() {
         </ActionPanel>
       }
     >
+      {hasError && (
+        <Form.Description
+          title="Unable to Load Calendars"
+          text="Calendar choices are unavailable. Check the error and reopen this command later."
+        />
+      )}
       <Form.TextField
         id="title"
         title="Title"

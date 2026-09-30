@@ -12,6 +12,7 @@ import { EventActions } from "./event-actions";
 export default function ListTodayEvents() {
   const [events, setEvents] = useState<EventWithCalendar[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     async function fetchEvents() {
@@ -23,11 +24,12 @@ export default function ListTodayEvents() {
       );
       const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
-      const { events } = await fetchEventsWithErrorHandling(
+      const { events, error } = await fetchEventsWithErrorHandling(
         startOfDay.toISOString(),
         endOfDay.toISOString(),
       );
       setEvents(events);
+      setHasError(error);
       setIsLoading(false);
     }
     fetchEvents();
@@ -37,9 +39,13 @@ export default function ListTodayEvents() {
     <List isLoading={isLoading} searchBarPlaceholder="Filter today's events...">
       {events.length === 0 && !isLoading ? (
         <List.EmptyView
-          icon={Icon.Calendar}
-          title="No Events Today"
-          description="Enjoy your free day!"
+          icon={hasError ? Icon.ExclamationMark : Icon.Calendar}
+          title={hasError ? "Unable to Load Events" : "No Events Today"}
+          description={
+            hasError
+              ? "Calendar availability is unknown. Check the error and try again later."
+              : "Enjoy your free day!"
+          }
         />
       ) : (
         events.map((event, index) => {

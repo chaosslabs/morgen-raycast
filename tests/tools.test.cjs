@@ -8,7 +8,7 @@ const ts = require('typescript');
 function load(file, mocks, globals = {}) {
   const exports = {};
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
   }).outputText;
   vm.runInNewContext(code, { exports, require: (id) => {
     if (!(id in mocks)) throw new Error(`Unexpected dependency ${id}`);
@@ -86,4 +86,23 @@ test('calendar scope excludes other calendars and fails closed for unknown names
   assert.equal(selected[0].name, 'Demo');
   scope = 'Missing';
   await assert.rejects(api.listCalendars(), /No calendar matches/);
+});
+
+
+test('list commands distinguish failed reads from empty calendars', () => {
+  for (const file of ['src/list-today-events.tsx', 'src/search-events.tsx']) {
+    for (const failed of [true, false]) {
+      const states = file.includes('search') ? [[], '', false, failed] : [[], false, failed];
+      const List = Object.assign(() => {}, { EmptyView: 'EmptyView' });
+      const command = load(file, {
+        '@raycast/api': { List, Icon: {} },
+        react: { useState: () => [states.shift(), () => {}], useEffect: () => {} },
+        'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
+        './utils': {}, './event-actions': {},
+      });
+      const empty = command.default().props.children;
+      assert.equal(empty.props.title, failed ? 'Unable to Load Events' : file.includes('search') ? 'No Events Found' : 'No Events Today');
+      if (failed) assert.match(empty.props.description, /availability is unknown/);
+    }
+  }
 });
