@@ -6,13 +6,17 @@ Source repository: https://github.com/chaosslabs/morgen-raycast (public, MIT).
 
 Publish publicly under the verified personal Raycast account `biancarosa`. The manifest sets `author: biancarosa` and omits organization `owner` and `access` fields. The source repository and project attribution remain under chaOSSlabs on GitHub. Store acceptance remains subject to Raycast review.
 
+## Current evidence
+
+See [live testing](live-testing.md) for successful create/read-back and AI checks, the rate-limit failure found during screenshot capture, and remaining checks. One reviewed Store screenshot is in `metadata/`; Search Events and Create Event captures remain.
+
 ## Before submission
 
 - Confirm publisher identity and resolve full `npm run lint` validation.
 - Check the installed Raycast API against the current release and update/test if needed.
 - Run `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build`.
 - Exercise all commands and AI tools against a live Morgen account, including timezone handling and creation confirmation. Verify created events in Morgen.
-- Capture real screenshots using synthetic calendar data; place Store/README media in `media/`. Do not publish private event details.
+- Capture real screenshots using synthetic calendar data; place Store screenshots in `metadata/` and README media in `media/`. Do not publish private event details.
 - Verify the icon in light and dark mode and review Morgen's service/branding terms.
 - Review and commit intended changes, preserving unrelated local work.
 - Run `npm run publish` interactively to submit a PR to `raycast/extensions`. Store listing follows Raycast review and acceptance.
