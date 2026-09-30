@@ -31,6 +31,8 @@ Create a new calendar event with a title, date, start time, duration, and calend
 
 Set **Calendar Scope** in Raycast extension preferences to an exact calendar name to restrict commands and AI tools to matching calendars. Leave it empty to use all connected calendars. If the name does not match, the extension returns an error instead of querying other calendars. Calendar names may not be unique across accounts; use a unique name when strict isolation is needed.
 
+Set **Scoped Calendar Display Name** to an optional label such as “Personal” for the scoped calendars in commands and AI results. This does not rename calendars in Morgen or change their IDs. It only applies when Calendar Scope is set. Event content can still contain private details.
+
 ## AI tools
 
 - **List Calendars** returns calendar IDs, write permissions, current time, and your local timezone.

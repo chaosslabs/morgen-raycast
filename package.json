@@ -23,6 +23,13 @@
       "description": "Optional exact calendar name. When set, only matching calendars are available to commands and AI tools. Leave empty to use all calendars.",
       "type": "textfield",
       "required": false
+    },
+    {
+      "name": "calendarAlias",
+      "title": "Scoped Calendar Display Name",
+      "description": "Optional display label for a scoped calendar. Does not rename the calendar in Morgen. Requires Calendar Scope.",
+      "type": "textfield",
+      "required": false
     }
   ],
   "commands": [

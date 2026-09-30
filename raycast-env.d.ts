@@ -11,7 +11,9 @@ type ExtensionPreferences = {
   /** Morgen API Key - API key from the Developers API page at platform.morgen.so. Requires a Morgen plan with API access. */
   "morgenApiKey": string,
   /** Calendar Scope - Optional exact calendar name. When set, only matching calendars are available to commands and AI tools. Leave empty to use all calendars. */
-  "calendarName"?: string
+  "calendarName"?: string,
+  /** Scoped Calendar Display Name - Optional display label for a scoped calendar. Does not rename the calendar in Morgen. Requires Calendar Scope. */
+  "calendarAlias"?: string
 }
 
 /** Preferences accessible in all the extension's commands */
