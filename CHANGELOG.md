@@ -1,6 +1,6 @@
 # Changelog
 
-## Initial Version - {PR_MERGE_DATE}
+## [Initial Version] - {PR_MERGE_DATE}
 
 - View today's Morgen events and search upcoming meetings.
 - Create timed events on writable calendars.
