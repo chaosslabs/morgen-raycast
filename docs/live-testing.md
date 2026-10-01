@@ -26,3 +26,16 @@ The UI had discarded the error flag from its fetch helper and displayed a succes
 - The two test events were not deleted by this workflow.
 
 Local validation after the failure-state fix: 7 tests, TypeScript, Raycast lint, and build passed. Store submission has not been performed.
+
+## Slow retest — 2026-10-01
+
+Repeated live checks with at least 45 seconds between command/tool operations (each read operation may internally fetch calendars and then events). No rate-limit errors appeared during this run.
+
+- Create Event loaded the scoped Personal calendar successfully.
+- Submitted one new “Raycast test — Focus session” for 2026-10-01 at 21:00, one hour, on that calendar.
+- Search Events and List Today's Events independently returned the newly stored event with the expected start and duration.
+- A separate AI List Calendars check returned one calendar, Personal, and the current local date/timezone.
+- A single AI Find Events call returned the test title, stored start `2026-10-01T21:00:00`, timezone `America/Argentina/Cordoba`, duration `PT1H`, and an event ID. No AI writes or retries were requested in this retest.
+- The new test event remains in the personal calendar. No work calendar was used.
+
+This verifies recovery from the prior rate limit; it does not establish the service's rate-limit threshold. Manual AI confirmation, cross-timezone/DST behavior, and the two remaining saved Store screenshots are still outstanding.
