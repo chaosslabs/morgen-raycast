@@ -41,3 +41,11 @@ Repeated live checks with at least 45 seconds between command/tool operations (e
 - The new test event remains in the personal calendar. No work calendar was used.
 
 This verifies recovery from the prior rate limit; it does not establish the service's rate-limit threshold. Manual AI confirmation, cross-timezone/DST behavior, and the two remaining saved Store screenshots are still outstanding.
+
+## Manual AI confirmation — user verification
+
+The maintainer reported that manual AI creation confirmation was verified. This is user-reported verification; the automated live runs above used Auto permissions and did not independently observe that dialog. Screenshot completion and cross-timezone/DST checks remain separate outstanding items.
+
+## Store screenshots completed — 2026-10-01
+
+Saved and visually inspected the native Raycast Search Events capture (`metadata/morgen-2.png`) and populated Create Event form (`metadata/morgen-3.png`). Both files are 2000×1250 PNGs, use the same clean background as the Today capture, and show only synthetic event content with the Personal display label. The screenshot draft was not submitted. All three Store screenshots are now saved; cross-timezone/DST validation remains outstanding.
