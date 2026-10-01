@@ -1,15 +1,35 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { showToast, Toast } from "@raycast/api";
 import { listCalendars, listEvents, MorgenCalendar, MorgenEvent } from "./api";
 
 export type EventWithCalendar = MorgenEvent & { calendarName: string };
 
-export function formatTime(isoString: string): string {
-  const date = new Date(isoString);
+// Morgen returns wall-clock start values with a separate IANA timeZone.
+// Preserve explicit offsets; interpret floating values in the local zone.
+export function eventDate(isoString: string, timeZone?: string | null): Date {
+  if (/(?:Z|[+-]\d{2}:\d{2})$/i.test(isoString)) {
+    return new Date(Temporal.Instant.from(isoString).epochMilliseconds);
+  }
+  const zoned = Temporal.PlainDateTime.from(isoString).toZonedDateTime(
+    timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    { disambiguation: "compatible" },
+  );
+  return new Date(zoned.epochMilliseconds);
+}
+
+export function formatTime(
+  isoString: string,
+  timeZone?: string | null,
+): string {
+  const date = eventDate(isoString, timeZone);
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export function formatDateTime(isoString: string): string {
-  const date = new Date(isoString);
+export function formatDateTime(
+  isoString: string,
+  timeZone?: string | null,
+): string {
+  const date = eventDate(isoString, timeZone);
   const dateStr = date.toLocaleDateString([], {
     weekday: "short",
     month: "short",
@@ -26,6 +46,7 @@ export function computeDuration(
   start: string,
   end?: string,
   duration?: string,
+  timeZone?: string | null,
 ): string {
   let minutes: number | undefined;
   if (duration) {
@@ -36,7 +57,8 @@ export function computeDuration(
       minutes = h * 60 + m;
     }
   } else if (end) {
-    const ms = new Date(end).getTime() - new Date(start).getTime();
+    const ms =
+      eventDate(end, timeZone).getTime() - eventDate(start, timeZone).getTime();
     minutes = Math.round(ms / 60000);
   }
   if (minutes === undefined || minutes <= 0) return "";
@@ -89,7 +111,9 @@ export async function fetchEventsForRange(
   }
 
   allEvents.sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) =>
+      eventDate(a.start, a.showWithoutTime ? undefined : a.timeZone).getTime() -
+      eventDate(b.start, b.showWithoutTime ? undefined : b.timeZone).getTime(),
   );
   return allEvents;
 }

@@ -71,7 +71,7 @@ export interface MorgenEvent {
   start: string;
   end?: string;
   duration?: string;
-  timeZone?: string;
+  timeZone?: string | null;
   calendarId: string;
   accountId: string;
   calendarName?: string;

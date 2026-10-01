@@ -49,3 +49,11 @@ The maintainer reported that manual AI creation confirmation was verified. This 
 ## Store screenshots completed — 2026-10-01
 
 Saved and visually inspected the native Raycast Search Events capture (`metadata/morgen-2.png`) and populated Create Event form (`metadata/morgen-3.png`). Both files are 2000×1250 PNGs, use the same clean background as the Today capture, and show only synthetic event content with the Personal display label. The screenshot draft was not submitted. All three Store screenshots are now saved; cross-timezone/DST validation remains outstanding.
+
+## Focused automated timezone validation
+
+Reproduced a display bug: a 10:00 Europe/London event on 2026-10-01 displayed as 10:00 on a Cordoba machine, instead of 06:00. Morgen's [event schema](https://docs.morgen.so/events) supplies a local start and separate IANA timezone.
+
+The UI now resolves that pair through the Temporal polyfill before local display, sorting, and end-based duration calculation. Explicit offsets remain authoritative; missing/null zones use the machine timezone. All-day labels remain unchanged. Temporal compatible disambiguation chooses the first occurrence of overlapping wall times and moves nonexistent wall times forward across the gap; without an offset the provider's intended second overlap occurrence cannot be recovered.
+
+All 10 tests passed under the machine timezone, UTC, and America/New_York. Cases cover London, New York winter/summer, Tokyo date rollover, spring DST gaps, fall overlaps, explicit offsets, floating values, elapsed duration, and cross-zone sorting. TypeScript, Raycast lint, and build passed. These were isolated automated checks, with no Morgen requests or new events. No additional live cross-zone test was performed.

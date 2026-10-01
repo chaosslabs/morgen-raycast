@@ -8,7 +8,7 @@ Publish publicly under the verified personal Raycast account `biancarosa`. The m
 
 ## Current evidence
 
-See [live testing](live-testing.md) for successful create/read-back and AI checks, the rate-limit failure found during screenshot capture, and remaining checks. Three reviewed 2000×1250 Store screenshots are in `metadata/`: Today (`morgen-1.png`), Search (`morgen-2.png`), and Create Event (`morgen-3.png`). Manual AI creation confirmation was verified by the maintainer; cross-timezone/DST checks remain outstanding.
+See [live testing](live-testing.md) for successful create/read-back and AI checks, the rate-limit failure found during screenshot capture, and remaining checks. Three reviewed 2000×1250 Store screenshots are in `metadata/`: Today (`morgen-1.png`), Search (`morgen-2.png`), and Create Event (`morgen-3.png`). Manual AI creation confirmation was verified by the maintainer; focused automated cross-timezone/DST checks passed and the confirmed timezone display bug was fixed (see the validation record).
 
 ## Before submission
 

@@ -106,3 +106,46 @@ test('list commands distinguish failed reads from empty calendars', () => {
     }
   }
 });
+
+test('London event displays the same instant as its UTC timestamp', () => {
+  const utils = load('src/utils.ts', { '@raycast/api': {}, './api': {}, '@js-temporal/polyfill': require('@js-temporal/polyfill') });
+  assert.equal(utils.formatTime('2026-10-01T10:00:00', 'Europe/London'), utils.formatTime('2026-10-01T09:00:00Z'));
+});
+
+test('event dates resolve foreign zones, DST transitions, and explicit offsets', () => {
+  const utils = load('src/utils.ts', { '@raycast/api': {}, './api': {}, '@js-temporal/polyfill': require('@js-temporal/polyfill') });
+  const cases = [
+    ['2026-10-01T10:00:00', 'Europe/London', '2026-10-01T09:00:00Z'],
+    ['2026-10-01T01:00:00', 'Asia/Tokyo', '2026-09-30T16:00:00Z'],
+    ['2026-01-15T10:00:00', 'America/New_York', '2026-01-15T15:00:00Z'],
+    ['2026-07-15T10:00:00', 'America/New_York', '2026-07-15T14:00:00Z'],
+    ['2026-03-08T01:30:00', 'America/New_York', '2026-03-08T06:30:00Z'],
+    ['2026-03-08T03:30:00', 'America/New_York', '2026-03-08T07:30:00Z'],
+    // Compatible disambiguation: move gaps forward; choose first overlap occurrence.
+    ['2026-03-08T02:30:00', 'America/New_York', '2026-03-08T07:30:00Z'],
+    ['2026-11-01T01:30:00', 'America/New_York', '2026-11-01T05:30:00Z'],
+    ['2026-11-01T01:30:00-05:00', 'America/New_York', '2026-11-01T06:30:00Z'],
+  ];
+  for (const [start, zone, utc] of cases) {
+    assert.equal(utils.eventDate(start, zone).toISOString(), new Date(utc).toISOString());
+    assert.equal(utils.formatTime(start, zone), utils.formatTime(utc));
+    assert.equal(utils.formatDateTime(start, zone), utils.formatDateTime(utc));
+  }
+  assert.equal(utils.eventDate('2026-10-01T10:00:00', null).getTime(), new Date('2026-10-01T10:00:00').getTime());
+  assert.equal(utils.computeDuration('2026-03-08T01:30:00', '2026-03-08T03:30:00', undefined, 'America/New_York'), '1h');
+});
+
+test('events sort by actual instant across calendars and timezones', async () => {
+  const utils = load('src/utils.ts', {
+    '@raycast/api': {}, '@js-temporal/polyfill': require('@js-temporal/polyfill'),
+    './api': {
+      listCalendars: async () => [calendar],
+      listEvents: async () => [
+        { id: 'later', calendarId: 'cal', start: '2026-10-01T09:00:00', timeZone: 'America/New_York' },
+        { id: 'earlier', calendarId: 'cal', start: '2026-10-01T10:00:00', timeZone: 'Asia/Tokyo' },
+      ],
+    },
+  });
+  const result = await utils.fetchEventsForRange('2026-10-01T00:00:00Z', '2026-10-02T00:00:00Z');
+  assert.equal(result[0].id, 'earlier');
+});

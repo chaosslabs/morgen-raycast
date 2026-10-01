@@ -60,11 +60,12 @@ export default function SearchEvents() {
         filtered.map((event, index) => {
           const datetime = event.showWithoutTime
             ? "All day"
-            : formatDateTime(event.start);
+            : formatDateTime(event.start, event.timeZone);
           const duration = computeDuration(
             event.start,
             event.end,
             event.duration,
+            event.timeZone,
           );
           const accessories = [
             ...(getConferenceUrl(event) ? [{ icon: Icon.Video }] : []),

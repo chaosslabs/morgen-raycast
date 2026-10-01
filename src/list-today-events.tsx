@@ -51,11 +51,12 @@ export default function ListTodayEvents() {
         events.map((event, index) => {
           const time = event.showWithoutTime
             ? "All day"
-            : formatTime(event.start);
+            : formatTime(event.start, event.timeZone);
           const duration = computeDuration(
             event.start,
             event.end,
             event.duration,
+            event.timeZone,
           );
           const accessories = [
             ...(getConferenceUrl(event) ? [{ icon: Icon.Video }] : []),

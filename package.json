@@ -56,6 +56,7 @@
     }
   ],
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "@raycast/api": "^2.6.0",
     "@raycast/utils": "^1.19.1"
   },
