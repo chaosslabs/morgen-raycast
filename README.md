@@ -63,6 +63,8 @@ npx tsc --noEmit
 
 Run `npm test` for isolated tool/API tests and `npm run build` to validate generated AI tool schemas. These checks do not verify a live Morgen account. The public Store publisher is `biancarosa`. Source code and project maintenance remain under chaOSSlabs on GitHub. Store publication remains subject to Raycast review.
 
+For a paced end-to-end check against a real personal/test calendar, follow the [synthetic test guide](docs/synthetic-test.md). Recorded outcomes are in [live testing](docs/live-testing.md).
+
 ## Data and privacy
 
 The extension reads your API key from Raycast preferences and sends authenticated requests to Morgen. It does not include a separate analytics service. When using AI tools, calendar names and event details returned by those tools are available to Raycast AI; review your Raycast AI settings before use.

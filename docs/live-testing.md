@@ -1,5 +1,7 @@
 # Live validation — 2026-09-30
 
+Repeat this workflow using the [paced synthetic test guide](synthetic-test.md).
+
 Tested the development extension in Raycast on macOS using a single user-approved personal calendar. Calendar Scope excluded other calendars from event reads and writes. No attendees were invited. Private addresses, credentials, and calendar/event IDs are omitted from this record.
 
 ## Successful checks
